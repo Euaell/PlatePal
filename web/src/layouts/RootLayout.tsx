@@ -36,7 +36,7 @@ function AvatarDropDown(): JSX.Element {
 		<div className="dropdown dropdown-end">
 			<label tabIndex={0} className="btn btn-ghost btn-circle avatar">
 				<div className="w-10 rounded-full">
-					<img src="/images/avatar.jpg"  alt='Avatar of User'/>
+					<img src="/images/avatar.jpg" alt='Avatar of User'/>
 				</div>
 			</label>
 			<ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
@@ -58,8 +58,8 @@ function LoginSignUp(): JSX.Element {
 
 	return (
 		<div className="flex-none gap-0.5">
-			<button className="btn btn-ghost mx-1" onClick={() => navigate('/login')}> Login </button>
-			<button className="btn btn-outline btn-accent mx-1" onClick={() => navigate('/signup')}> Sign Up </button>
+			<button className="btn btn-ghost mx-1" onClick={() => navigate('/auth/login')}> Login </button>
+			<button className="btn btn-outline btn-accent mx-1" onClick={() => navigate('/auth/signup')}> Sign Up </button>
 		</div>
 	)
 }

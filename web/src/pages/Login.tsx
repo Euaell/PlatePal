@@ -1,5 +1,6 @@
 import { JSX } from "react";
 import useForm from "../helpers/useForm.ts";
+import {Link} from "react-router-dom";
 
 const loginModel = {
 	Email: "",
@@ -43,10 +44,16 @@ export default function Login(): JSX.Element {
 				</div>
 				<button
 					type="submit"
-					className="btn w-full py-2 px-4 btn-active btn-ghost hover:bg-gray-600 hover:text-white focus:bg-black"
+					className="btn w-full py-2 px-4 bg-green-600 outline-none hover:bg-green-700 hover:text-white focus:bg-black"
 				>
 					Login
 				</button>
+
+				<br />
+				<br />
+				<Link to={"/auth/signup"} className="w-full py-2 px-4 link">
+					Don't have an account? Signup
+				</Link>
 			</form>
 		</div>
 	)
