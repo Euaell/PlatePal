@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser"
 import { ErrorHandler } from "./middlewares/ErrorHandler"
 import routes from "./routes";
 import schema, {createContext} from "./schema/schema";
-import Authenticate from "./middlewares/Authenticate";
 
 
 const app = express()
