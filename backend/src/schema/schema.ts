@@ -6,8 +6,11 @@ import {
 	GraphQLID,
 	GraphQLSchema
 } from "graphql"
-import UserModel from "../models/UserModel";
-import RecipesModel from "../models/RecipesModel";
+import UserModel, {IUser} from "../models/UserModel";
+import RecipesModel, {IRecipe} from "../models/RecipesModel";
+import Authenticate from "../middlewares/Authenticate";
+import {Request, Response} from "express";
+import {GraphQLParams} from "express-graphql";
 
 const UserType = new GraphQLObjectType({
 	name: "User",
@@ -20,7 +23,7 @@ const UserType = new GraphQLObjectType({
 		ProfilePic: { type: GraphQLString },
 		FavoriteRecipes: {
 			type: new GraphQLList(RecipeType),
-			resolve(parent, args) {
+			resolve(parent: IUser, args) {
 				return UserModel.findById(parent.id).populate("FavoriteRecipes").then((user) => {
 					return user.FavoriteRecipes
 				})
@@ -49,8 +52,8 @@ const RecipeType = new GraphQLObjectType({
 		Reviews: { type: new GraphQLList(GraphQLString) },
 		User: {
 			type: UserType,
-			async resolve(parent, args) {
-				return await UserModel.findById(parent.UserID)
+			async resolve(parent: IRecipe, args) {
+				return UserModel.findById(parent.UserID);
 			}
 		}
 	})
@@ -81,8 +84,27 @@ const RootQuery = new GraphQLObjectType({
 		},
 		recipes: {
 			type: new GraphQLList(RecipeType),
-			resolve(parent, args) {
+			resolve(parent, args, context) {
 				return RecipesModel.find({})
+			}
+		},
+		login: {
+			type: UserType,
+			args: {
+				Email: { type: GraphQLString },
+				Password: { type: GraphQLString }
+			},
+			async resolve(parent, args, context) {
+				const user: IUser | null = await UserModel.login(args.Email, args.Password)
+				if (!user) {
+					throw new Error("Invalid credentials")
+				}
+				const token = user.GenerateToken()
+				context.res.cookie("token", token, { httpOnly: true })
+
+				// remove password when sending to client
+				user.Password = ""
+				return user
 			}
 		}
 	}
@@ -95,20 +117,32 @@ const Mutation = new GraphQLObjectType({
 			type: RecipeType,
 			args: {
 				Name: { type: new GraphQLNonNull(GraphQLString) },
+				Description: { type: new GraphQLNonNull(GraphQLString) },
 				Ingredients: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
 				Steps: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
-				Images: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) },
-				UserID: { type: new GraphQLNonNull(GraphQLID) }
+				Images: { type: new GraphQLNonNull(new GraphQLList(GraphQLString)) }
 			},
-			async resolve(parent, args) {
-				const recipe = await RecipesModel.create(args)
-				await UserModel.findByIdAndUpdate(args.UserID, { $push: { RecipesMade: recipe._id } })
+			async resolve(parent, args, context) {
+				if (!context.user) {
+					throw new Error("You must be logged in to create a recipe")
+				}
+				const recipe = await RecipesModel.create({...args, UserID: context.user._id})
+				await UserModel.findByIdAndUpdate(context.user._id, { $push: { RecipesMade: recipe._id } })
 				return recipe
 			}
 		},
-
 	}
 })
+
+export async function createContext(req: Request, res: Response, params: GraphQLParams) {
+	const user: IUser | null = await Authenticate.authenticateGraphql(req)
+	return {
+		user,
+		req,
+		res,
+		params
+	}
+}
 
 export default new GraphQLSchema({
 	query: RootQuery,

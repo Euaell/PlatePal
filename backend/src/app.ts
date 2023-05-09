@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express"
-import { graphqlHTTP } from "express-graphql"
+import {graphqlHTTP, GraphQLParams} from "express-graphql"
 import { createWriteStream } from "fs"
 import { join } from "path"
 import morgan from "morgan"
@@ -8,7 +8,8 @@ import cookieParser from "cookie-parser"
 
 import { ErrorHandler } from "./middlewares/ErrorHandler"
 import routes from "./routes";
-import schema from "./schema/schema";
+import schema, {createContext} from "./schema/schema";
+import Authenticate from "./middlewares/Authenticate";
 
 
 const app = express()
@@ -27,10 +28,17 @@ app.use(cors({
 	exposedHeaders: ["token"]
 }))
 
-app.use("/api/v1/graphql", graphqlHTTP({
+// using middleware
+// app.use("/api/v1/graphql", Authenticate.authenticate, graphqlHTTP({
+// 	schema,
+// 	graphiql: true
+// }))
+
+app.use("/api/v1/graphql", graphqlHTTP(async (request: Request, response: Response, params: GraphQLParams) => ({
 	schema,
-	graphiql: true
-}))
+	graphiql: true,
+	context: await createContext(request, response, params)
+})))
 
 app.use("/api/v1/users", routes.UserRoute)
 app.use("/api/v1/unverified-users", routes.UnverifiedUserRoute)

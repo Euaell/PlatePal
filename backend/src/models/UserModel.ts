@@ -98,9 +98,17 @@ UserSchema.statics.findByToken = async function (token: string) : Promise<IUser 
 }
 
 UserSchema.statics.login = async function (email: string, password: string) : Promise<IUser | null> {
-//     TODO: Implement login
-    return new Promise((resolve, reject) => {
-        resolve(null)
+    return new Promise(async (resolve, reject) => {
+        const user = await this.findOne({Email: email} )
+        if (!user) {
+            reject("User not found")
+        }
+        const isMatch = await user.ComparePassword(password)
+        if (!isMatch) {
+            reject("Wrong password")
+        }
+        resolve(user)
+
     })
 }
 

@@ -8,11 +8,13 @@ export default class Authenticate {
 			const token = req.cookies.token || req.headers.token
 			if (!token) {
 				res.status(401).json({ message: 'Unauthorized' })
+				return next(new Error("Unauthorized"))
 			}
 
 			const user: IUser | null = await UserModel.findByToken(token)
 			if (!user) {
-				throw new Error("Invalid token")
+				res.status(401).json({ message: 'Invalid token' })
+				return next(new Error("Invalid token"))
 			}
 
 			const userObj = user.toObject()
@@ -34,6 +36,23 @@ export default class Authenticate {
 			next()
 		} catch (error) {
 			next(error)
+		}
+	}
+
+	public static async authenticateGraphql( req: Request ): Promise<IUser | null> {
+		try {
+			const token = req.cookies.token || req.headers.token
+			if (!token) return null
+
+			const user: IUser | null = await UserModel.findByToken(token)
+			if (!user) return null
+
+			const userObj = user.toObject()
+			delete userObj.Password
+
+			return userObj
+		} catch (error) {
+			return null
 		}
 	}
 }

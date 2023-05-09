@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import RecipesModel, { IRecipe } from "../models/RecipesModel"
+import UserModel from "../models/UserModel";
 
 export class RecipesController {
 	public static async getRecipies( req: Request, res: Response, next: NextFunction ): Promise<Response> {
@@ -29,7 +30,8 @@ export class RecipesController {
 		try {
 			const { Name, Description,  Ingredients, Steps, Images, user } = req.body
 			const recipe: IRecipe = await RecipesModel.create({ Name, Description, Ingredients, Steps, Images, UserID: user._id })
-			return res.status(201).json({recipe})
+			await UserModel.findByIdAndUpdate(user._id, { $push: { RecipesMade: recipe._id } }, { new: true })
+			return res.status(201).json({ recipe })
 		} catch (error) {
 			next(error)
 		}
