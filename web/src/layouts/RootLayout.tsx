@@ -1,5 +1,7 @@
-import { JSX } from "react";
-import {Link, Outlet, useNavigate} from "react-router-dom";
+import { JSX } from "react"
+import { Link, Outlet, useNavigate } from "react-router-dom"
+import { useAuth } from "../helpers/useAuth.ts"
+import {apiEndpoint, ENDPOINTS} from "../helpers/api";
 
 export default function RootLayout(): JSX.Element {
 	return (
@@ -12,7 +14,8 @@ export default function RootLayout(): JSX.Element {
 	)
 }
 
-function NavBar() {
+function NavBar(): JSX.Element {
+	const { user } = useAuth()
 	return (
 		<div className="navbar bg-base-100" style={{position: "sticky", top: 0, left: 0}}>
 			<div className="flex-1 ml-4">
@@ -23,8 +26,10 @@ function NavBar() {
 					<input type="text" placeholder="Search" className="input input-bordered" />
 				</div>
 
-				<LoginSignUp />
-				<AvatarDropDown />
+				{user && user.token ?
+					<AvatarDropDown /> :
+					<LoginSignUp />
+				}
 
 			</div>
 		</div>
@@ -32,6 +37,19 @@ function NavBar() {
 }
 
 function AvatarDropDown(): JSX.Element {
+	const { resetUser } = useAuth()
+
+	function logout() {
+		apiEndpoint(ENDPOINTS.users.logout)
+			.post({})
+			.then(() => {
+				resetUser()
+				// refresh page
+				window.location.reload()
+			})
+			.catch(console.error);
+	}
+
 	return (
 		<div className="dropdown dropdown-end">
 			<label tabIndex={0} className="btn btn-ghost btn-circle avatar">
@@ -41,13 +59,13 @@ function AvatarDropDown(): JSX.Element {
 			</label>
 			<ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
 				<li>
-					<a className="justify-between">
+					<Link to='/profile' className="justify-between">
 						Profile
 						<span className="badge">New</span>
-					</a>
+					</Link>
 				</li>
-				<li><a>Settings</a></li>
-				<li><a>Logout</a></li>
+				<li><Link to='/setting'>Settings</Link></li>
+				<li><a onClick={() => logout()}>Logout</a></li>
 			</ul>
 		</div>
 	)

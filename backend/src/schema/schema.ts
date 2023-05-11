@@ -95,12 +95,14 @@ const RootQuery = new GraphQLObjectType({
 				Password: { type: GraphQLString }
 			},
 			async resolve(parent, args, context) {
-				const user: IUser | null = await UserModel.login(args.Email, args.Password)
-				if (!user) {
-					throw new Error("Invalid credentials")
+				const user: IUser | object = await UserModel.login(args.Email, args.Password)
+
+				if (!(user instanceof UserModel)) {
+					console.log("user is not instance of UserModel")
+					return user
 				}
 				const token = user.GenerateToken()
-				context.res.cookie("token", token, { httpOnly: true })
+				context.res.cookie("token", token, { httpOnly: true, sameSite: "none", secure: true })
 
 				// remove password when sending to client
 				user.Password = ""

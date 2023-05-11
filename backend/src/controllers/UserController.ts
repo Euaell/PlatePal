@@ -2,6 +2,8 @@ import { Response, Request, NextFunction } from "express"
 import User, { IUser } from "../models/UserModel"
 import UnverifiedUserModel, { IUnverifiedUser } from "../models/UnverifiedUserModel";
 import UserModel from "../models/UserModel";
+import configs from "../config/configs";
+import jwt from 'jsonwebtoken'
 
 export default class UserController {
     public static async getUsers( req: Request, res: Response, next: NextFunction ): Promise<Response> {
@@ -63,12 +65,17 @@ export default class UserController {
 			delete userObj.Password
 
             const token = user.GenerateToken()
+            const token1 = await jwt.sign(
+                {_id: user.id},
+                configs.JWT_SECRET,
+                {expiresIn: configs.JWT_EXPIRES_IN}
+            )
 
-            res.cookie("token", token, {httpOnly: true})
+            res.cookie("token", token1, { httpOnly: true })
             return res.status(200).json({
-                user: userObj,
+                user: { ...userObj, token: token1 },
                 message: "Logged in",
-                token
+                token1
             })
         } catch (error) {
             next(error)
@@ -76,6 +83,7 @@ export default class UserController {
     }
 
     public static async logoutUser( req: Request, res: Response, next: NextFunction ): Promise<Response> {
+        res.clearCookie("token", { httpOnly: true })
         res.clearCookie("token")
         return res.status(200).json({message: "Logged out"})
     }

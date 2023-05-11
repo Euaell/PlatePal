@@ -27,7 +27,7 @@ export interface IUser extends Document{
 }
 
 interface UserModel extends Model<IUser> {
-    login(email: string, password: string): any
+    login(email: string, password: string): IUser | object
     findByToken(token: string): IUser | null
 }
 
@@ -97,15 +97,15 @@ UserSchema.statics.findByToken = async function (token: string) : Promise<IUser 
     })
 }
 
-UserSchema.statics.login = async function (email: string, password: string) : Promise<IUser | null> {
+UserSchema.statics.login = async function (email: string, password: string) : Promise<IUser | object> {
     return new Promise(async (resolve, reject) => {
         const user = await this.findOne({Email: email} )
         if (!user) {
-            reject("User not found")
+            reject({ Email: "User not found" })
         }
         const isMatch = await user.ComparePassword(password)
         if (!isMatch) {
-            reject("Wrong password")
+            reject({ Password: "Wrong password" })
         }
         resolve(user)
 

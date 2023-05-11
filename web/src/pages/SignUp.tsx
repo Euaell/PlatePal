@@ -19,7 +19,7 @@ export default function SignUp(): JSX.Element {
 	const { values, handleChange, handleSubmit } = useForm(signupModel, signup);
 	return (
 		<div className="max-w-sm mx-auto mt-8">
-			<form onSubmit={handleSubmit} className="p-6 bg-base-200/40 shadow-md rounded-md">
+			<form onSubmit={handleSubmit} className="p-6 bg-base-200/75 shadow-md rounded-md">
 				<h2 className="text-2xl font-bold mb-6">Signup</h2>
 				<div className="mb-4">
 					<label htmlFor="username" className="block font-semibold mb-2">Username</label>
@@ -85,7 +85,7 @@ export default function SignUp(): JSX.Element {
 
 				<button
 					type="submit"
-					className="btn w-full py-2 px-4 bg-green-600 outline-none hover:bg-green-700 hover:text-white focus:bg-black"
+					className="btn btn-accent w-full py-2 px-4 bg-green-600 border-0 hover:bg-green-700 hover:text-white focus:bg-black"
 				>
 					SIGN UP
 				</button>

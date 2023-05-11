@@ -8,7 +8,7 @@ router.get("/", UserController.getUsers)
 router.post("/", UserController.createUser)
 
 router.post("/login", UserController.loginUser)
-router.get("/logout", Authenticate.authenticate, UserController.logoutUser)
+router.post("/logout", Authenticate.authenticate, UserController.logoutUser)
 router.get("/verifyuser", Authenticate.authenticate, UserController.verifyUser)
 
 router.get("/:id", UserController.getUser)
