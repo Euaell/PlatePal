@@ -65,17 +65,12 @@ export default class UserController {
 			delete userObj.Password
 
             const token = user.GenerateToken()
-            const token1 = await jwt.sign(
-                {_id: user.id},
-                configs.JWT_SECRET,
-                {expiresIn: configs.JWT_EXPIRES_IN}
-            )
 
-            res.cookie("token", token1, { httpOnly: true })
+            res.cookie("token", token, { httpOnly: true })
             return res.status(200).json({
-                user: { ...userObj, token: token1 },
+                user: { ...userObj, token },
                 message: "Logged in",
-                token1
+                token
             })
         } catch (error) {
             next(error)

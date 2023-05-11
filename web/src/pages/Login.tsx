@@ -36,7 +36,7 @@ export default function Login(): JSX.Element {
 			<form onSubmit={handleSubmit} className="p-6 bg-base-200/75 shadow-md rounded-md">
 				<h2 className="text-2xl font-bold mb-6">Login</h2>
 				<div className="mb-4">
-					<label htmlFor="email" className="block font-semibold mb-2">Email</label>
+					<label htmlFor="Email" className="block font-semibold mb-2">Email</label>
 					<input
 						type="email"
 						id="Email"
@@ -48,7 +48,7 @@ export default function Login(): JSX.Element {
 					/>
 				</div>
 				<div className="mb-4">
-					<label htmlFor="password" className="block font-semibold mb-2">Password</label>
+					<label htmlFor="Password" className="block font-semibold mb-2">Password</label>
 					<input
 						type="password"
 						id="Password"
