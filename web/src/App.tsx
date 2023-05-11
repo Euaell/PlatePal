@@ -16,6 +16,7 @@ import {JSX} from "react";
 import Authenticate from "./helpers/Authenticate.tsx";
 import Setting from "./pages/Setting.tsx";
 import Profile from "./pages/Profile.tsx";
+import Recipes from "./pages/Recipe/Recipes.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -28,7 +29,7 @@ const router = createBrowserRouter(
 			<Route path={'/'} element={<RootLayout />} >
 				<Route index element={<Home />} />
 				<Route element={<Authenticate />}>
-					<Route path='recipes' element={<div>Recipes</div>} />
+					<Route path='recipes' element={<Recipes />} />
 
 					<Route path='profile' element={<Profile />} />
 					<Route path='setting' element={<Setting />} />

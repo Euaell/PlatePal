@@ -9,3 +9,21 @@ export const LOGIN = gql`
 		}
 	}
 `
+export const GET_RECIPES = gql`
+	query GetRecipes {
+		recipes {
+			id
+			Name
+			Ingredients
+			Steps
+			Description
+			Images
+			Reviews
+			User {
+				Username
+				Email
+				ProfilePic
+			}
+		}
+	}
+`

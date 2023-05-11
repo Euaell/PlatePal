@@ -1,6 +1,5 @@
-import {useAuth} from "../helpers/useAuth.ts";
-import {ChangeEvent, useState} from "react";
-import {Link} from "react-router-dom";
+import { useAuth } from "../helpers/useAuth.ts";
+import { ChangeEvent, useState } from "react";
 import useForm from "../helpers/useForm.ts";
 
 export default function Profile() {
@@ -44,7 +43,6 @@ function EditProfile({ setShowForm }: { setShowForm: (show: boolean) => void }) 
 		console.log("edit")
 
 
-
 	}
 
 	function handleChangeLocal(e: ChangeEvent<HTMLInputElement>) {
@@ -77,7 +75,6 @@ function EditProfile({ setShowForm }: { setShowForm: (show: boolean) => void }) 
 					name='Username'
 					value={values.Username}
 					onChange={handleChangeLocal}
-					required
 					className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 				/>
 			</div>
@@ -89,22 +86,28 @@ function EditProfile({ setShowForm }: { setShowForm: (show: boolean) => void }) 
 					name='Email'
 					value={values.Email}
 					onChange={handleChangeLocal}
-					required
 					className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 				/>
 			</div>
-			<div className="mb-4">
-				<label htmlFor="ProfilePic" className="block font-semibold mb-2">Profile Picture</label>
+			<div className="form-control w-full max-w-sm mb-4">
+				<label htmlFor='ProfilePic' className="label">
+					<span className="label-text">Pick a file</span>
+				</label>
 				<input
 					type="file"
-					id="ProfilePic"
-					name='ProfilePic'
+					id='ProfilePic'
+					accept="image/*"
+					className="file-input file-input-bordered file-input-secondary w-full max-w-xm"
+					name="ProfilePic"
 					value={values.ProfilePic}
 					onChange={handleChangeLocal}
-					required
-					className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 				/>
+
+				<label htmlFor='ProfilePic' className="label">
+					<span className="label-text-alt">Max. 2MB</span>
+				</label>
 			</div>
+
 			<button
 				type="submit"
 				className="btn btn-accent inline w-1/3 mr-10 py-2 px-4 border-0 bg-green-600 hover:bg-green-700 hover:text-white focus:bg-black"
@@ -118,12 +121,6 @@ function EditProfile({ setShowForm }: { setShowForm: (show: boolean) => void }) 
 			>
 				Cancel
 			</button>
-
-			<br />
-			<br />
-			<Link to={"/auth/signup"} className="w-full py-2 px-4 link">
-				Don't have an account? Signup
-			</Link>
 		</form>
 	)
 }

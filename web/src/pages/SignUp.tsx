@@ -75,11 +75,12 @@ export default function SignUp(): JSX.Element {
 				</div>
 				{/*ProfilePic*/}
 				<div className="form-control w-full max-w-sm mb-4">
-					<label className="label">
+					<label htmlFor='ProfilePic' className="label">
 						<span className="label-text">Pick a file</span>
 					</label>
 					<input
 						type="file"
+						id="ProfilePic"
 						accept="image/*"
 						className="file-input file-input-bordered file-input-secondary w-full max-w-xm"
 						name="ProfilePic"
@@ -88,7 +89,7 @@ export default function SignUp(): JSX.Element {
 						required
 					/>
 
-					<label className="label">
+					<label htmlFor='ProfilePic' className="label">
 						<span className="label-text-alt">Max. 2MB</span>
 					</label>
 				</div>

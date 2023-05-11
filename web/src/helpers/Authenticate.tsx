@@ -12,13 +12,11 @@ export default function Authenticate() {
 			.then((response) => {
 				return response.data;
 			})
-			.then((data) => {
-				console.log(data);
+			.then(() => {
 				setVerified(true)
 				setLoading(false)
 			})
-			.catch((error) => {
-				console.error(error)
+			.catch(() => {
 				setVerified(false)
 				setLoading(false)
 			});
