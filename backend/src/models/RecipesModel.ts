@@ -6,7 +6,8 @@ export interface IRecipe extends Document {
 	Ingredients: string[]
 	Steps: string[]
 	Images: string[]
-	Reviews: string[]
+	Reviews: Schema.Types.ObjectId[]
+	Rating: number
 	UserID: Schema.Types.ObjectId
 }
 
@@ -37,10 +38,17 @@ const RecipeSchema: Schema<IRecipe> = new Schema({
 		required: true,
 		default: []
 	},
-	Reviews: {
-		type: [String],
-		required: true,
-		default: []
+	Reviews: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: "Review"
+		}
+	],
+	Rating: {
+		type: Number,
+		default: 0,
+		min: 0,
+		max: 5
 	},
 	UserID: {
 		type: Schema.Types.ObjectId,

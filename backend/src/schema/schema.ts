@@ -4,13 +4,14 @@ import {
 	GraphQLNonNull,
 	GraphQLList,
 	GraphQLID,
-	GraphQLSchema
+	GraphQLSchema, GraphQLInt
 } from "graphql"
 import UserModel, {IUser} from "../models/UserModel";
 import RecipesModel, {IRecipe} from "../models/RecipesModel";
 import Authenticate from "../middlewares/Authenticate";
 import {Request, Response} from "express";
 import {GraphQLParams} from "express-graphql";
+import ReviewModel from "../models/ReviewModel";
 
 const UserType = new GraphQLObjectType({
 	name: "User",
@@ -56,6 +57,27 @@ const RecipeType = new GraphQLObjectType({
 				return UserModel.findById(parent.UserID);
 			}
 		}
+	})
+})
+
+const ReviewType = new GraphQLObjectType({
+	name: "Review",
+	fields: () => ({
+		id: { type: GraphQLID },
+		Comment: { type: GraphQLString },
+		Rating: { type: GraphQLInt },
+		User: {
+			type: UserType,
+			async resolve(parent, args) {
+				return UserModel.findById(parent.UserID);
+			}
+		},
+		Recipe: {
+			type: RecipeType,
+			async resolve(parent, args) {
+				return RecipesModel.findById(parent.RecipeID);
+			}
+		},
 	})
 })
 
@@ -108,6 +130,12 @@ const RootQuery = new GraphQLObjectType({
 				user.Password = ""
 				return user
 			}
+		},
+		reviews: {
+			type: new GraphQLList(ReviewType),
+			resolve(parent, args) {
+				return ReviewModel.find({})
+			}
 		}
 	}
 })
@@ -133,6 +161,22 @@ const Mutation = new GraphQLObjectType({
 				return recipe
 			}
 		},
+		addReview: {
+			type: ReviewType,
+			args: {
+				Comment: { type: new GraphQLNonNull(GraphQLString) },
+				Rating: { type: new GraphQLNonNull(GraphQLInt) },
+				RecipeID: { type: new GraphQLNonNull(GraphQLID) }
+			},
+			async resolve(parent, args, context) {
+				if (!context.user) {
+					throw new Error("You must be logged in to create a review")
+				}
+				const review = await ReviewModel.create({...args, UserID: context.user._id})
+				await RecipesModel.findByIdAndUpdate(args.RecipeID, { $push: { Reviews: review._id } })
+				return review
+			}
+		}
 	}
 })
 

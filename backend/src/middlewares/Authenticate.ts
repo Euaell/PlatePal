@@ -5,7 +5,7 @@ export default class Authenticate {
 
 	public static async authenticate( req: Request, res: Response, next: NextFunction ): Promise<void> {
 		try {
-			const token = req.headers.token
+			const token = req.headers.token || req.cookies.token
 			if (!token || Array.isArray(token)) {
 				res.status(401).json({ message: 'Unauthorized' })
 				return next(new Error("Unauthorized"))
@@ -41,8 +41,8 @@ export default class Authenticate {
 
 	public static async authenticateGraphql( req: Request ): Promise<IUser | null> {
 		try {
-			const token = req.cookies.token || req.headers.token
-			if (!token) return null
+			const token = req.headers.token || req.cookies.token
+			if (!token || Array.isArray(token)) return null
 
 			const user: IUser | null = await UserModel.findByToken(token)
 			if (!user) return null
