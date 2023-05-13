@@ -2,9 +2,6 @@ import { Response, Request, NextFunction } from "express"
 import User, { IUser } from "../models/UserModel"
 import UnverifiedUserModel, { IUnverifiedUser } from "../models/UnverifiedUserModel";
 import UserModel from "../models/UserModel";
-import configs from "../config/configs";
-import jwt from 'jsonwebtoken'
-
 export default class UserController {
     public static async getUsers( req: Request, res: Response, next: NextFunction ): Promise<Response> {
         try {
