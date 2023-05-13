@@ -30,6 +30,7 @@ export default class ImageController {
 
 	public static async uploadImages( req: Request, res: Response, next: NextFunction) : Promise<Response> {
 		try {
+			console.log(req.files)
 			const files: any = req.files
 			if (!files) {
 				return res.status(400).json({ message: 'Please upload a file' })

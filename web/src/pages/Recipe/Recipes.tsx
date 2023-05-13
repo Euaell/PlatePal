@@ -16,7 +16,11 @@ export default function Recipes() {
 	// console.log(data)
 	return (
 		<div className="hero min-h-screen min-w-full flex flex-col items-center space-y-8 w-full " style={{backgroundImage: `url("/images/bgImage.jpg")`, backgroundSize: 'cover', width: "100%"}}>
-			<h1 className="text-3xl font-semibold">Recipes</h1>
+			<div className="w-full h-20 bg-base-200/80 flex flex-row justify-center items-center">
+
+				<h1 className="text-3xl flex-1 ml-36 pl-40 font-semibold">Recipes</h1>
+				<button className="btn btn-accent m-8" onClick={() => navigate('add')}>Add Recipe</button>
+			</div>
 
 			<div className="grid grid-cols-2 gap-4">
 				{data.recipes.map((recipe: any) => (

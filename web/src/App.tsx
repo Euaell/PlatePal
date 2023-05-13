@@ -18,6 +18,7 @@ import Setting from "./pages/Setting.tsx";
 import Profile from "./pages/Profile.tsx";
 import Recipes from "./pages/Recipe/Recipes.tsx";
 import RecipesDetail from "./pages/Recipe/RecipesDetail.tsx";
+import AddRecipes from "./pages/Recipe/AddRecipes.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -31,6 +32,7 @@ const router = createBrowserRouter(
 				<Route index element={<Home />} />
 				<Route element={<Authenticate />}>
 					<Route path='recipes' element={<Recipes />} />
+					<Route path='recipes/add' element={<AddRecipes />} />
 					<Route path='recipes/:recipeID' element={<RecipesDetail />} />
 
 					<Route path='profile' element={<Profile />} />
