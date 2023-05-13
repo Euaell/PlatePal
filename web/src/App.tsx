@@ -11,12 +11,13 @@ import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthLayout from "./layouts/AuthLayout.tsx";
 import SignUp from "./pages/SignUp.tsx";
-import {UserProvider} from "./helpers/UserProvider.tsx";
-import {JSX} from "react";
+import { UserProvider } from "./helpers/UserProvider.tsx";
+import { JSX } from "react";
 import Authenticate from "./helpers/Authenticate.tsx";
 import Setting from "./pages/Setting.tsx";
 import Profile from "./pages/Profile.tsx";
 import Recipes from "./pages/Recipe/Recipes.tsx";
+import RecipesDetail from "./pages/Recipe/RecipesDetail.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
 				<Route index element={<Home />} />
 				<Route element={<Authenticate />}>
 					<Route path='recipes' element={<Recipes />} />
+					<Route path='recipes/:recipeID' element={<RecipesDetail />} />
 
 					<Route path='profile' element={<Profile />} />
 					<Route path='setting' element={<Setting />} />
@@ -43,6 +45,7 @@ const router = createBrowserRouter(
 )
 
 function App(): JSX.Element {
+
 	return (
 		<UserProvider>
 			<RouterProvider router={router} />

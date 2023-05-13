@@ -4,14 +4,14 @@ import {
 	GraphQLNonNull,
 	GraphQLList,
 	GraphQLID,
-	GraphQLSchema, GraphQLInt
+	GraphQLSchema, GraphQLInt, GraphQLFloat
 } from "graphql"
-import UserModel, {IUser} from "../models/UserModel";
-import RecipesModel, {IRecipe} from "../models/RecipesModel";
+import UserModel, { IUser } from "../models/UserModel";
+import RecipesModel, { IRecipe } from "../models/RecipesModel";
 import Authenticate from "../middlewares/Authenticate";
-import {Request, Response} from "express";
-import {GraphQLParams} from "express-graphql";
-import ReviewModel from "../models/ReviewModel";
+import { Request, Response } from "express";
+import { GraphQLParams } from "express-graphql";
+import ReviewModel, {IReview} from "../models/ReviewModel";
 
 const UserType = new GraphQLObjectType({
 	name: "User",
@@ -50,7 +50,13 @@ const RecipeType = new GraphQLObjectType({
 		Ingredients: { type: new GraphQLList(GraphQLString) },
 		Steps: { type: new GraphQLList(GraphQLString) },
 		Images: { type: new GraphQLList(GraphQLString) },
-		Reviews: { type: new GraphQLList(GraphQLString) },
+		Rating: { type: GraphQLFloat },
+		Reviews: {
+			type: new GraphQLList(ReviewType),
+			async resolve(parent: IRecipe, args) {
+				return ReviewModel.find({RecipeID: parent.id})
+			}
+		},
 		User: {
 			type: UserType,
 			async resolve(parent: IRecipe, args) {
@@ -88,17 +94,18 @@ const RootQuery = new GraphQLObjectType({
 			type: UserType,
 			args: { id: { type: GraphQLID } },
 			resolve(parent, args) {
-				return UserModel.findById(args.id)
+				return UserModel.findById(args.id).select("-Password")
 			}
 		},
 		users: {
 			type: new GraphQLList(UserType),
 			resolve(parent, args) {
-				return UserModel.find({})
+				return UserModel.find({}).select("-Password")
 			}
 		},
 		recipe: {
 			type: RecipeType,
+			description: "Get a recipe by ID",
 			args: { id: { type: GraphQLID } },
 			resolve(parent, args) {
 				return RecipesModel.findById(args.id)
@@ -166,14 +173,22 @@ const Mutation = new GraphQLObjectType({
 			args: {
 				Comment: { type: new GraphQLNonNull(GraphQLString) },
 				Rating: { type: new GraphQLNonNull(GraphQLInt) },
-				RecipeID: { type: new GraphQLNonNull(GraphQLID) }
+				RecipeID: { type: new GraphQLNonNull(GraphQLID) },
+				UserID: { type: new GraphQLNonNull(GraphQLID) }
 			},
-			async resolve(parent, args, context) {
-				if (!context.user) {
-					throw new Error("You must be logged in to create a review")
-				}
-				const review = await ReviewModel.create({...args, UserID: context.user._id})
-				await RecipesModel.findByIdAndUpdate(args.RecipeID, { $push: { Reviews: review._id } })
+			async resolve(parent, args): Promise<IReview> {
+				const review: IReview = await ReviewModel.create(args)
+
+				// add review to recipe and
+				// recalculate rating
+				const recipe: IRecipe = await RecipesModel.findById(args.RecipeID)
+				// console.log(`(${recipe.Rating} * ${recipe.Reviews.length}) + ${args.Rating}) / (${recipe.Reviews.length} + 1)`)
+				const newRation: number = recipe.Rating != 0 ? ((recipe.Rating * recipe.Reviews.length) + args.Rating) / (recipe.Reviews.length + 1) : args.Rating
+				await RecipesModel.findByIdAndUpdate(args.RecipeID, {
+					$push: { Reviews: review._id },
+					$set: { Rating: newRation }
+				})
+
 				return review
 			}
 		}

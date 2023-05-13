@@ -1,7 +1,7 @@
 import axios, {AxiosInstance} from "axios"
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
-axios.defaults.withCredentials = true
+// axios.defaults.withCredentials = true
 
 const api: AxiosInstance = axios.create({
 	baseURL: BASE_URL,
@@ -24,6 +24,9 @@ interface IEndpoints {
 		getRecipes: string,
 		getRecipeByID: string,
 		addRecipe: string
+	},
+	reviews: {
+		addReview: string
 	}
 }
 
@@ -42,6 +45,9 @@ export const ENDPOINTS: IEndpoints = {
 		getRecipes: "recipes",
 		getRecipeByID: "recipes",
 		addRecipe: "recipes",
+	},
+	reviews: {
+		addReview: "reviews"
 	}
 }
 

@@ -1,17 +1,24 @@
-import {useQuery} from "@apollo/client";
-import {GET_RECIPES} from "../../queries/queries.ts";
+import { useQuery } from "@apollo/client";
+import { GET_RECIPES } from "../../queries/queries.ts";
+import { useNavigate } from "react-router-dom";
+import { ErrorPage } from "../Error.tsx";
 
 export default function Recipes() {
 	const { data, loading, error } = useQuery(GET_RECIPES)
+	const navigate = useNavigate()
 
 	if (loading) return <p>Loading...</p>
-	if (error) return <p>Error :(</p>
+	if (error) {
+		console.log(error)
+		return <ErrorPage />
+	}
 
+	// console.log(data)
 	return (
-		<div className="hero min-h-screen min-w-full flex flex-col items-center space-y-8 w-full ">
+		<div className="hero min-h-screen min-w-full flex flex-col items-center space-y-8 w-full " style={{backgroundImage: `url("/images/bgImage.jpg")`, backgroundSize: 'cover', width: "100%"}}>
 			<h1 className="text-3xl font-semibold">Recipes</h1>
 
-			<div className="grid grid-cols-2 gap-4" style={{backgroundImage: `url("/images/bgImage.jpg")`, backgroundSize: 'cover', width: "100%"}}>
+			<div className="grid grid-cols-2 gap-4">
 				{data.recipes.map((recipe: any) => (
 					<div key={recipe.id} className="flex flex-col justify-between bg-base-200/80 w-96 m-3 rounded-2xl">
 						<div>
@@ -30,7 +37,8 @@ export default function Recipes() {
 							<div className="divider"></div>
 
 							{/*Recipe Name*/}
-							<h2 className="text-lg text-center font-semibold mt-2">{recipe.Name}</h2>
+							<h2 className="cursor-pointer hover:underline text-lg text-center font-semibold mt-2" onClick={() => navigate(`${recipe.id}`)}>{recipe.Name}</h2>
+
 							<div className="divider"></div>
 
 							{/*Description*/}

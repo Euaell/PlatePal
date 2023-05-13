@@ -1,11 +1,19 @@
 import { Request, Response, NextFunction } from "express"
 import ReviewModel, { IReview } from "../models/ReviewModel"
+import RecipesModel from "../models/RecipesModel";
 
 export default class ReviewController {
 	public static async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
 		try {
 			const { Comment, Rating, RecipeID, user } = req.body
 			const review = await ReviewModel.create({ Comment, Rating, RecipeID, UserID: user._id })
+			const recipe = await RecipesModel.findById(RecipeID)
+			const newRation: number = recipe.Rating != 0 ? ((recipe.Rating * recipe.Reviews.length) + Rating) / (recipe.Reviews.length + 1) : Rating
+			await RecipesModel.findByIdAndUpdate(RecipeID, {
+				$push: { Reviews: review._id },
+				$set: { Rating: newRation }
+			})
+
 			return res.status(201).json({ review })
 		} catch (error) {
 			next(error)
@@ -59,6 +67,9 @@ export default class ReviewController {
 			const { id } = req.params
 			const review: IReview = await ReviewModel.findByIdAndDelete(id)
 			if (!review) {
+				await RecipesModel.findByIdAndUpdate(review.RecipeID, { $pull: { Reviews: review._id } })
+				// TODO: recalculate rating
+
 				return res.status(404).json({ message: "Review not found" })
 			}
 			return res.status(200).json({ review })

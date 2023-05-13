@@ -66,8 +66,8 @@ export default class UserController {
 
             const token = user.GenerateToken()
 
-            res.cookie("token", token, { httpOnly: true })
-            return res.status(200).json({
+            // res.cookie("token", token, { httpOnly: true })
+            return res.cookie("token", token, { httpOnly: true }).status(200).json({
                 user: { ...userObj, token },
                 message: "Logged in",
                 token

@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser"
 
 import { ErrorHandler } from "./middlewares/ErrorHandler"
 import routes from "./routes";
-import schema, {createContext} from "./schema/schema";
+import schema from "./schema/schema";
 
 const app = express()
 export const accessLogStream = createWriteStream(join(__dirname, "access.log"), { flags: "a" })
@@ -32,17 +32,16 @@ app.use(cors({
 // 	graphiql: true
 // }))
 
-app.use("/api/v1/graphql", graphqlHTTP(async (request: Request, response: Response, params: GraphQLParams) => ({
-	schema,
-	graphiql: true,
-	context: await createContext(request, response, params)
-})))
-
 app.use("/api/v1/users", routes.UserRoute)
 app.use("/api/v1/unverified-users", routes.UnverifiedUserRoute)
 app.use("/api/v1/images", routes.ImageRoute)
 app.use("/api/v1/recipes", routes.RecipesRoute)
 app.use("/api/v1/reviews", routes.ReviewRoute)
+
+app.use("/api/v1/graphql", graphqlHTTP(async (request: Request, response: Response, params: GraphQLParams) => ({
+	schema,
+	graphiql: true
+})))
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({ message: "Hello World!" })
