@@ -41,7 +41,7 @@ export default function SignUp(): JSX.Element {
 	}
 
 	function handleProfilePic(e: ChangeEvent<HTMLInputElement>) {
-
+		if (e.target.files === null) return;
 		const file = e.target.files[0];
 		if (!file) return;
 		const formData = new FormData();
