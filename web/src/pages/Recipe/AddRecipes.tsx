@@ -1,29 +1,47 @@
 import useForm from "../../helpers/useForm.ts";
-import { ChangeEvent } from "react";
-import {apiEndpoint, ENDPOINTS} from "../../helpers/api";
+import { ChangeEvent, useState } from "react";
+import {  apiEndpoint, ENDPOINTS } from "../../helpers/api";
+import { useNavigate } from "react-router-dom";
+import { useApolloClient } from "@apollo/client";
+import {GET_RECIPES} from "../../queries/queries.ts";
 
 const AddRecipeModel = () => ({
 	Name: "",
 	Description: "",
-	Ingredients: [""],
+	Ingredients: [],
 	Steps: [],
-	Images: []
+	Images: Array<string>()
 })
 export default function AddRecipes() {
+	const client = useApolloClient()
 	const { values, setValues, handleChange, handleSubmit } = useForm(AddRecipeModel(), create)
+	const [buttonActive, setButtonActive] = useState(false)
 
+	const navigate = useNavigate()
 	function handleSplit(e: ChangeEvent<HTMLTextAreaElement>) {
 		const value = e.target.value.split('\n')
 		const name = e.target.name
 		setValues({...values, [name]: value})
 	}
 
-	function handleImages(e: ChangeEvent<HTMLInputElement>) {
-		console.log("handle Images")
+	async function handleImages(e: ChangeEvent<HTMLInputElement>) {
+		const files: File[] = Array.from(e.target.files as FileList)
+		const formData: FormData = new FormData()
+		await Promise.all(files.map(async (file) => {
+			formData.append('Images', file)
+		}))
+
 		apiEndpoint(ENDPOINTS.images.multiple)
-			.post({ Images: e.target.files })
+			.post(formData)
 			.then(res => {
-				console.log(res)
+				return res.data.data
+			})
+			.then(async data => {
+				console.log(data)
+				await Promise.all(data.map(async (image: any) => {
+					values.Images.push(image.secure_url as string)
+				}))
+				setButtonActive(true)
 			})
 			.catch(err => {
 				console.log(err)
@@ -32,6 +50,20 @@ export default function AddRecipes() {
 
 	function create(value: any) {
 		console.log("Create: ", value)
+
+		// normal way
+		apiEndpoint(ENDPOINTS.recipes.addRecipe)
+			.post(value)
+			.then(res => {
+				console.log(res)
+				client.refetchQueries({include: [{
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					query: GET_RECIPES
+					}]})
+				navigate('/recipes')
+			})
+			.catch(console.error)
 	}
 
 	return (
@@ -46,28 +78,28 @@ export default function AddRecipes() {
 							<label className="label" htmlFor="Name">
 								<span className="label-text">Recipe Name</span>
 							</label>
-							<input id="Name" name="Name" value={values.Name} type="text" placeholder="Recipe Name" className="input input-bordered" onChange={handleChange}/>
+							<input id="Name" name="Name" value={values.Name} type="text" placeholder="Recipe Name" className="input input-bordered" onChange={handleChange} required/>
 						</div>
 
 						<div className="form-control">
 							<label className="label" htmlFor="Description">
 								<span className="label-text">Description</span>
 							</label>
-							<textarea id="Description" name="Description" value={values.Description} onChange={handleChange} placeholder="Description" className="textarea h-24 textarea-bordered" />
+							<textarea required id="Description" name="Description" value={values.Description} onChange={handleChange} placeholder="Description" className="textarea h-24 textarea-bordered" />
 						</div>
 
 						<div className="form-control">
 							<label className="label" htmlFor="Ingredients">
 								<span className="label-text">Ingredients</span>
 							</label>
-							<textarea id="Ingredients" name="Ingredients" value={values.Ingredients.join('\n')} onChange={handleSplit} placeholder="Ingredients" className="textarea h-24 textarea-bordered"></textarea>
+							<textarea required id="Ingredients" name="Ingredients" value={values.Ingredients.join('\n')} onChange={handleSplit} placeholder="Ingredients" className="textarea h-24 textarea-bordered"></textarea>
 						</div>
 
 						<div className="form-control">
 							<label className="label" htmlFor="Steps">
 								<span className="label-text">Steps</span>
 							</label>
-							<textarea id="Steps" name="Steps" value={values.Steps.join('\n')} onChange={handleSplit} placeholder="Steps" className="textarea h-24 textarea-bordered"></textarea>
+							<textarea required id="Steps" name="Steps" value={values.Steps.join('\n')} onChange={handleSplit} placeholder="Steps" className="textarea h-24 textarea-bordered"></textarea>
 						</div>
 
 						<div className="form-control">
@@ -83,6 +115,7 @@ export default function AddRecipes() {
 								className="file-input file-input-bordered file-input-accent"
 								accept="image/*"
 								multiple
+								required
 							/>
 							<label className="label">
 								<span className='label-text-alt'>Images</span>
@@ -91,7 +124,7 @@ export default function AddRecipes() {
 
 						<br />
 
-						<button type='submit' className="btn btn-primary">Submit</button>
+						<button type='submit' className={buttonActive ? "btn btn-primary" : "btn btn-primary btn-disabled"}>Submit</button>
 
 					</form>
 				</div>

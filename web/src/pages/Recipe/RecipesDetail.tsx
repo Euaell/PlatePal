@@ -31,14 +31,16 @@ export default function RecipesDetail(): JSX.Element {
 				{/*Description*/}
 				<div className='flex flex-col justify-center p-4 min-w-fit'>
 					<p className='text-lg text-center'>By: {data.recipe.User.Username}</p>
-					<p className="font-light text-center">Rating: <span className='font-extrabold'> {data.recipe.Rating}/5 </span> </p>
+					<div className='text-center'>
+						<Rating rating={data.recipe.Rating} />
+					</div>
 					<br/>
 					<p className='text-lg'>{data.recipe.Description}</p>
 				</div>
 
 				{/*	Image Carousel*/}
 				{data.recipe.Images?.length ?
-					<div className="carousel carousel-center min-w-md p-4 space-x-4 bg-neutral rounded-box">
+					<div className="carousel carousel-center min-w-md p-4 space-x-3 bg-neutral mx-9 rounded-box">
 						{data.recipe.Images.map((image: string, index: number) => (
 							<div className="carousel-item" key={index}>
 								<img src={image} className="rounded-box" alt='Recipe Image'/>
@@ -99,9 +101,10 @@ const AddReviewModel = (recipeId: string) => ({
 })
 
 function AddReview({ RecipeID, refetch }: any): JSX.Element {
-	const { setValues, handleChange, handleSubmit } = useForm(AddReviewModel(RecipeID), submitReview)
+	const { values, setValues, handleChange, handleSubmit } = useForm(AddReviewModel(RecipeID), submitReview)
 
 	function submitReview(values: any) {
+		console.log(values)
 		apiEndpoint(ENDPOINTS.reviews.addReview)
 			.post(values)
 			.then((res) => {
@@ -137,7 +140,7 @@ function AddReview({ RecipeID, refetch }: any): JSX.Element {
 					<label className="label" htmlFor='Comment'>
 						<span className="label-text">Comment</span>
 					</label>
-					<textarea id='Comment' name='Comment' className="textarea h-24 textarea-bordered" placeholder="Enter your comment here..." onChange={handleChange}/>
+					<textarea id='Comment' name='Comment' className="textarea h-24 textarea-bordered" placeholder="Enter your comment here..." value={values.Comment} onChange={handleChange}/>
 				</div>
 
 				<button type='submit' className="btn btn-primary">Submit</button>

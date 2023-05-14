@@ -8,10 +8,12 @@ export default class ReviewController {
 			const { Comment, Rating, RecipeID, user } = req.body
 			const review = await ReviewModel.create({ Comment, Rating, RecipeID, UserID: user._id })
 			const recipe = await RecipesModel.findById(RecipeID)
-			const newRation: number = recipe.Rating != 0 ? ((recipe.Rating * recipe.Reviews.length) + Rating) / (recipe.Reviews.length + 1) : Rating
+			console.log(`(${recipe.Rating} * ${recipe.Reviews.length}) + ${Rating}) / (${recipe.Reviews.length} + 1)`)
+			const newRation: number = recipe.Rating != 0 ? ((recipe.Rating * recipe.Reviews.length) + Number(Rating)) / (recipe.Reviews.length + 1) : Rating
+			console.log(newRation)
 			await RecipesModel.findByIdAndUpdate(RecipeID, {
 				$push: { Reviews: review._id },
-				$set: { Rating: newRation }
+				Rating: newRation
 			})
 
 			return res.status(201).json({ review })

@@ -9,8 +9,8 @@ export default function useForm<T>(initialValues: T, onSubmit: (values: T) => vo
 		onSubmit(values);
 	};
 
-	const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { name, value } = event.target;
+	const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> ) => {
+		const { name, value }: { name: string, value: string | number} = event.target;
 		setValues({ ...values, [name]: value });
 	};
 
