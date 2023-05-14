@@ -10,7 +10,7 @@ export default function Profile() {
 		<div className="flex flex-col min-h-screen items-center justify-start space-y-4 bg-secondary-focus/5">
 			<img
 				className="h-32 w-32 rounded-full object-cover mt-10"
-				src={"/images/avatar.jpg"}
+				src={user.ProfilePic}
 				alt="Profile avatar"
 			/>
 			<h1 className="text-2xl font-semibold">{user.Username}</h1>
@@ -41,8 +41,6 @@ function EditProfile({ setShowForm }: { setShowForm: (show: boolean) => void }) 
 
 	function handleEdit() {
 		console.log("edit")
-
-
 	}
 
 	function handleChangeLocal(e: ChangeEvent<HTMLInputElement>) {

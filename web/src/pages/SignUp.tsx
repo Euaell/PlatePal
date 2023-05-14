@@ -1,22 +1,66 @@
-import { JSX } from "react";
+import { ChangeEvent, JSX } from "react";
 import useForm from "../helpers/useForm.ts";
-import {Link} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { apiEndpoint, ENDPOINTS } from "../helpers/api";
 
 const signupModel = {
 	Username: "",
 	Email: "",
+	verificationCode: "",
 	Password: "",
 	ConfirmPassword: "",
 	ProfilePic: ""
 }
 
 export default function SignUp(): JSX.Element {
+	const { values, setValues, handleChange, handleSubmit } = useForm(signupModel, signup);
+
+	const navigate = useNavigate()
+
 	function signup() {
-		console.log("Signup");
 		console.log(values)
+		apiEndpoint(ENDPOINTS.users.signup)
+			.post(values)
+			.then(res => {
+				console.log(res)
+				navigate('../login')
+			})
+			.catch(console.error)
 	}
 
-	const { values, handleChange, handleSubmit } = useForm(signupModel, signup);
+	function handleVerifyEmail() {
+		if (values.Email === "") return;
+		apiEndpoint(ENDPOINTS.users.verifyEmail)
+			.post({Email: values.Email})
+			.then(res => {
+				console.log(res)
+			})
+			.catch(err => {
+				console.log(err)
+			})
+	}
+
+	function handleProfilePic(e: ChangeEvent<HTMLInputElement>) {
+
+		const file = e.target.files[0];
+		if (!file) return;
+		const formData = new FormData();
+		formData.append("Profile", file);
+		apiEndpoint(ENDPOINTS.images.single)
+			.post(formData)
+			.then((res) => {
+				console.log(res);
+				return res.data.data
+			})
+			.then((data) => {
+				console.log(data)
+				setValues({...values, ProfilePic: data.secure_url})
+			})
+			.catch((err) => {
+				console.log(err);
+			})
+	}
+
 	return (
 		<div className="max-w-sm mx-auto mt-8">
 			<form onSubmit={handleSubmit} className="p-6 bg-base-200/75 shadow-md rounded-md">
@@ -34,6 +78,7 @@ export default function SignUp(): JSX.Element {
 						className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 					/>
 				</div>
+
 				{/*Email*/}
 				<div className="mb-4">
 					<label htmlFor="Email" className="block font-semibold mb-2">Email</label>
@@ -46,7 +91,23 @@ export default function SignUp(): JSX.Element {
 						required
 						className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 					/>
+					<button className='btn btn-accent mt-2' onClick={handleVerifyEmail}>Verify Email</button>
 				</div>
+
+				{/*Verification Code*/}
+				<div className="mb-4">
+					<label htmlFor="verificationCode" className="block font-semibold mb-2">Verification Code</label>
+					<input
+						type="text"
+						id="verificationCode"
+						name='verificationCode'
+						value={values.verificationCode}
+						onChange={handleChange}
+						required
+						className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
+					/>
+				</div>
+
 				{/*Password*/}
 				<div className="mb-4">
 					<label htmlFor="Password" className="block font-semibold mb-2">Password</label>
@@ -60,6 +121,7 @@ export default function SignUp(): JSX.Element {
 						className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 					/>
 				</div>
+
 				{/*ConfirmPassword*/}
 				<div className="mb-4">
 					<label htmlFor="ConfirmPassword" className="block font-semibold mb-2">Confirm Password</label>
@@ -73,6 +135,7 @@ export default function SignUp(): JSX.Element {
 						className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
 					/>
 				</div>
+
 				{/*ProfilePic*/}
 				<div className="form-control w-full max-w-sm mb-4">
 					<label htmlFor='ProfilePic' className="label">
@@ -84,9 +147,7 @@ export default function SignUp(): JSX.Element {
 						accept="image/*"
 						className="file-input file-input-bordered file-input-secondary w-full max-w-xm"
 						name="ProfilePic"
-						value={values.ProfilePic}
-						onChange={handleChange}
-						required
+						onChange={handleProfilePic}
 					/>
 
 					<label htmlFor='ProfilePic' className="label">

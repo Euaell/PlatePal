@@ -39,7 +39,7 @@ function NavBar(): JSX.Element {
 }
 
 function AvatarDropDown(): JSX.Element {
-	const { resetUser } = useAuth()
+	const { user, resetUser } = useAuth()
 
 	function logout() {
 		apiEndpoint(ENDPOINTS.users.logout)
@@ -56,7 +56,7 @@ function AvatarDropDown(): JSX.Element {
 		<div className="dropdown dropdown-end">
 			<label tabIndex={0} className="btn btn-ghost btn-circle avatar">
 				<div className="w-10 rounded-full">
-					<img src="/images/avatar.jpg" alt='Avatar of User'/>
+					<img src={user.ProfilePic != "profile_pic" ? user.ProfilePic : "/images/avatar.jpg"} alt='Avatar of User'/>
 				</div>
 			</label>
 			<ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">

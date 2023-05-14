@@ -14,7 +14,9 @@ interface IEndpoints {
 		login: string,
 		logout: string,
 		verify: string,
-		getUserByID: string
+		getUserByID: string,
+		verifyEmail: string,
+		signup: string
 	},
 	images: {
 		single: string,
@@ -35,7 +37,9 @@ export const ENDPOINTS: IEndpoints = {
 		login: "users/login",
 		logout: "users/logout",
 		verify: "users/verifyuser",
-		getUserByID: "users"
+		getUserByID: "users",
+		verifyEmail: "unverified-users",
+		signup: "users"
 	},
 	images: {
 		single: "images",
