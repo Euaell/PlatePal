@@ -6,7 +6,7 @@ view them later.
 
 [API Documentation](https://documenter.getpostman.com/view/18732335/2s93eX2ZEU)
 
-[Web](platepal.onrender.com)
+[Web](https://platepal-web.onrender.com/)
 
 PlatePal is built using:
 * Node.js
