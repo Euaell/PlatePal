@@ -5,7 +5,9 @@
 	"main": "jest.config.js",
 	"scripts": {
 		"test": "jest",
-		"dev": "npx nodemon"
+		"dev": "npx nodemon",
+		"start": "node dist/index.js",
+		"build": "npm install && tsc"
 	},
 	"author": "Euael Mekonen Eshete",
 	"license": "ISC",
